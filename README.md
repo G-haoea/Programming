@@ -1,4 +1,12 @@
 # 目录
+* [53 最大子序和](#53-最大子序和)    
+* [101 对称二叉树](#101-对称二叉树)    
+  * [解法1 递归](#解法1-递归)    
+  * [解法2 迭代](#解法2-迭代)    
+* [148 排序链表](#148-排序链表)    
+* [199 二叉树的右视图](#199-二叉树的右视图)    
+  * [解法1 广度优先搜索](#解法1-广度优先搜索)    
+  * [解法2 深度优先搜索](#解法2-深度优先搜索)    
 * [234 回文链表](#234-回文链表)    
   * [解法1 放入list里](#解法1-放入list里)    
   * [解法2 只翻转后半部分链表](#解法2-只翻转后半部分链表)    
@@ -6,6 +14,214 @@
 * [387 字符串中的第一个唯一字符](#387-字符串中的第一个唯一字符)    
 * [Other 1 判断是否为完全二叉树](#Other-1-判断是否为完全二叉树)    
 * [Other 2 找出数组中每一个数右面距离它最近的比它大的数](#Other-2-找出数组中每一个数右面距离它最近的比它大的数)    
+* [Other 3 给一个奇数位升序，偶数位降序的链表排成有序链表](#Other-3-给一个奇数位升序，偶数位降序的链表排成有序链表)    
+
+
+# 53 最大子序和
+* 设置全局最大值，开始，结束index；
+* 设置前一个最大值，sub开始，sub结束index；
+* 比较从index=1开始的所有元素；
+* 如果subMax>0表示对当前元素有增加作用，subMax就加上这个元素，subEnd++；
+* 否则sub就从当前元素开始，sub的开始结束index都变成当前index，sub的max也等于当前元素的值；
+* 然后比较subMax和max，看是否需要更新前后index；
+
+```java
+    public int maxSubArray(int[] nums) {
+		int start = 0;
+		int end = 0;
+		int subStart = 0;
+		int subEnd = 0;
+		int max = nums[0];
+		int subMax = nums[0];
+		for(int i=1; i<nums.length; i++) {
+			if(subMax > 0) {
+				subMax += nums[i];
+				subEnd++;
+			}else {
+				subMax = nums[i];
+				subStart = i;
+				subEnd = i;
+			}
+			if(subMax > max) {
+				max = subMax;
+				start = subStart;
+				end = subEnd;
+			}
+		}
+		System.out.println(start + "..." + end);
+		return max;
+	}
+```
+
+# 101 对称二叉树
+## 解法1 递归
+* 判断root和root；
+* 返回p.val == q.val && check(p.left, q.right) && check(p.right, q.left);
+
+```java
+    public boolean isSymmetric(TreeNode root) {
+		return check1(root, root);
+    }
+	
+	public boolean check1(TreeNode p, TreeNode q) {
+		if(p == null && q == null) {
+			return true;
+		}
+		if(p == null || q == null) {
+			return false;
+		}
+		return p.value == q.value && check1(p.LNode, q.RNode) && check1(p.RNode, q.LNode);
+	}
+```
+
+## 解法2 迭代
+* 提到跌倒就是队列；
+* 把两个root放进队列；
+* 判断出队的两个元素；
+* 记得先判断它俩是否为空，再判断值是否相等，因为会出现它是null取不到值的情况；
+* 再按照左的左，右的右，左的右，右的左的顺序，放入队列；
+
+```java
+    public boolean check2(TreeNode p, TreeNode q) {
+		Queue<TreeNode> queue = new LinkedList<>();
+		queue.add(p);
+		queue.add(q);
+		TreeNode nodeP = null;
+		TreeNode nodeQ = null;
+		while(!queue.isEmpty()) {
+			nodeP = queue.poll();
+			nodeQ = queue.poll();
+			if(nodeP == null && nodeQ == null) {
+				continue;
+			}
+			if(nodeP == null || nodeQ == null || nodeP.value != nodeQ.value) {
+				return false;
+			}
+			queue.add(nodeP.LNode);
+			queue.add(nodeQ.RNode);
+			
+			queue.add(nodeP.RNode);
+			queue.add(nodeQ.LNode);
+		}
+		return true;
+	}
+```
+
+
+# 148 排序链表
+* 归并排序；
+* 先递归排序好左右两部分；
+* 然后把左右两部分合并；
+* 返回链表头即可；
+
+```java
+    public ListNode sortList(ListNode head) {
+		if(head == null || head.next == null) {
+			return head;
+		}
+		ListNode fast = head;
+		ListNode slow = head;
+		while(fast.next != null && fast.next.next != null) {
+			fast = fast.next.next;
+			slow = slow.next;
+		}
+		ListNode tempNode = slow.next;
+		slow.next = null;
+		ListNode leftList = sortList(head);
+		ListNode rightList = sortList(tempNode);
+		ListNode result = mergeList(leftList, rightList);
+		return result;
+    }
+	
+	public ListNode mergeList(ListNode left, ListNode right) {
+		ListNode i = left;
+		ListNode j = right;
+		ListNode curIndexNode = new ListNode(-1);
+		ListNode result = curIndexNode;
+		while(i != null && j != null) {
+			if(i.value < j.value) {
+				curIndexNode.next = i;
+				i = i.next;
+			}else {
+				curIndexNode.next = j;
+				j = j.next;
+			}
+			curIndexNode = curIndexNode.next;
+		}
+		curIndexNode.next = i == null ? j : i;
+		return result.next;
+	}
+```
+
+
+# 199 二叉树的右视图
+## 解法1 广度优先搜索
+* 层序遍历；
+* 每一层最后一个元素就是右视图见到的第一个元素；
+* 队列；
+* 设置每一层的元素个数size即queue.size()来判断这一层是否遍历结束；
+
+```java
+    public List<Integer> rightSideView1(TreeNode root) {
+		Queue<TreeNode> queue = new LinkedList<>();
+		List<Integer> result = new ArrayList<>();
+		if(root == null) {
+			return result;
+		}
+		queue.add(root);
+		TreeNode curNode = null;
+		while(!queue.isEmpty()) {
+			int curSize = queue.size();
+			for(int i=0; i<curSize; i++) {
+				curNode = queue.peek();
+				if(curNode.LNode != null) {
+					queue.add(curNode.LNode);
+				}
+				if(curNode.RNode != null) {
+					queue.add(curNode.RNode);
+				}
+				if(i == curSize - 1) {
+					result.add(curNode.value);
+				}
+				queue.poll();
+			}
+			
+		}
+		
+		
+		return result;
+    }
+```
+
+## 解法2 深度优先搜索
+* 按深度进行搜索；
+* 先看右子树；
+**【左视图就先看左子树】**
+* 每一层最右面第一个访问的元素即右视图；
+* 设置当前depth，如果==result.size()表示当前节点是新一层的第一个节点，加入result list中；
+* 根节点的depth为0；
+
+```java
+    List<Integer> result = new ArrayList<>();
+	public List<Integer> rightSideView2(TreeNode root) {
+		dfs(root, 0);
+		return result;
+    }
+	
+	private void dfs(TreeNode root, int depth) {
+    	if(root == null) {
+    		return;
+    	}
+    	if(depth == result.size()) {
+    		result.add(root.value);
+    	}
+    	depth++;
+    	dfs(root.RNode, depth);
+    	dfs(root.LNode, depth);
+    }
+```
+
+
 
 # 234 回文链表
 ## 解法1 放入list里
@@ -225,5 +441,69 @@
 		}
 		
 		return result;
+	}
+```
+
+# Other 3 给一个奇数位升序，偶数位降序的链表排成有序链表
+* 先根据奇偶位进行拆分成两个链表；
+* 注意赋值拆分后的链表最后一位的next是null；
+* 对偶数位的链表进行翻转；
+* 两个链表进行合并；
+
+```java
+    public ListNode orderCustomList(ListNode head) {
+		ListNode tempNode1 = new ListNode(-1);
+		ListNode tempNode2 = new ListNode(-1);
+		ListNode listNode1 = tempNode1;
+		ListNode listNode2 = tempNode2;
+		ListNode curNode = head;
+		while(curNode != null && curNode.next != null) {
+			tempNode1.next = curNode;
+			tempNode2.next = curNode.next;
+			curNode = curNode.next.next;
+			tempNode1 = tempNode1.next;
+			tempNode2 = tempNode2.next;
+		}
+		tempNode1.next = curNode;
+		tempNode1 = tempNode1.next;
+		tempNode1.next = null;
+		tempNode2.next = null;
+		
+		listNode1 = listNode1.next;
+		listNode2 = reverseList(listNode2.next);
+		
+		ListNode result = mergeList(listNode1, listNode2);
+		return result;
+	}
+	
+	public ListNode reverseList(ListNode head) {
+		ListNode preNode = null;
+		ListNode curNode = head;
+		while(curNode != null) {
+			ListNode nextNode = curNode.next;
+			curNode.next = preNode;
+			preNode = curNode;
+			curNode = nextNode;
+		}
+		return preNode;
+	}
+	
+	public ListNode mergeList(ListNode left, ListNode right) {
+		ListNode i = left;
+		ListNode j = right;
+		ListNode curIndexNode = new ListNode(-1);
+		ListNode result = curIndexNode;
+		while(i != null && j != null) {
+			if(i.value < j.value) {
+				curIndexNode.next = i;
+				i = i.next;
+			}else {
+				curIndexNode.next = j;
+				j = j.next;
+			}
+			curIndexNode = curIndexNode.next;
+		}
+		curIndexNode.next = i == null ? j : i;
+		return result.next;
 	}
 ```
