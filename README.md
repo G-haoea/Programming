@@ -1,17 +1,29 @@
 # 目录
-* [53 最大子序和](#53-最大子序和)    
+* [53 最大子序和](#53-最大子序和)   
+* [98 验证二叉搜索树](#98-验证二叉搜索树)      
 * [101 对称二叉树](#101-对称二叉树)    
   * [解法1 递归](#解法1-递归)    
-  * [解法2 迭代](#解法2-迭代)    
+  * [解法2 迭代](#解法2-迭代)   
+* [102 二叉树的层序遍历](#102-二叉树的层序遍历)      
+* [104 二叉树的最大深度](#104-二叉树的最大深度)      
+  * [解法1 递归](#解法1-递归)      
+  * [解法2 层序遍历 队列](#解法2-层序遍历-队列)      
+* [111 二叉树的最小深度](#111-二叉树的最小深度)      
+  * [解法1 递归](#解法1-递归)      
+  * [解法2 层序遍历 队列](#解法2-层序遍历-队列)      
 * [148 排序链表](#148-排序链表)    
 * [199 二叉树的右视图](#199-二叉树的右视图)    
   * [解法1 广度优先搜索](#解法1-广度优先搜索)    
   * [解法2 深度优先搜索](#解法2-深度优先搜索)    
+* [226 翻转二叉树](#226-翻转二叉树)    
+  * [解法1 递归](#解法1-递归)    
+  * [解法2 迭代](#解法2-迭代)    
 * [234 回文链表](#234-回文链表)    
   * [解法1 放入list里](#解法1-放入list里)    
   * [解法2 只翻转后半部分链表](#解法2-只翻转后半部分链表)    
 * [236 二叉树的最近公共祖先](#236-二叉树的最近公共祖先)    
 * [387 字符串中的第一个唯一字符](#387-字符串中的第一个唯一字符)    
+* [704 二分查找](#704-二分查找)     
 * [Other 1 判断是否为完全二叉树](#Other-1-判断是否为完全二叉树)    
 * [Other 2 找出数组中每一个数右面距离它最近的比它大的数](#Other-2-找出数组中每一个数右面距离它最近的比它大的数)    
 * [Other 3 给一个奇数位升序 偶数位降序的链表排成有序链表](#Other-3-给一个奇数位升序-偶数位降序的链表排成有序链表)    
@@ -52,6 +64,42 @@
 		return max;
 	}
 ```
+
+
+# 98 验证二叉搜索树
+* 借助一个helper方法给定node和lower，upper界限；
+* 如果node的值在这个范围内（闭区间），就符合条件；
+
+```java
+    public boolean isValidBST(TreeNode root) {
+		return helper(root, null, null);
+    }
+	
+	public boolean helper(TreeNode node, Integer lower, Integer upper) {
+		if(node == null) {
+			return true;
+		}
+		
+		int value = node.value;
+		if(lower != null && value <= lower) {
+			return false;
+		}
+		if(upper != null && value >= upper) {
+			return false;
+		}
+		
+		if(!helper(node.LNode, lower, value)) {
+			return false;
+		}
+		if(!helper(node.RNode, value, upper)) {
+			return false;
+		}
+		
+		return true;
+	}
+```
+ 
+
 
 # 101 对称二叉树
 ## 解法1 递归
@@ -106,6 +154,158 @@
 		return true;
 	}
 ```
+
+
+# 102 二叉树的层序遍历
+* 常规队列；
+* 定位当前层floor；
+
+```java
+    public List<List<Integer>> levelOrder(TreeNode root) {
+		List<List<Integer>> result = new LinkedList<>();
+		if(root == null) {
+			return result;
+		}
+		Queue<TreeNode> queue = new LinkedList<>();
+		queue.add(root);
+		TreeNode curNode = null;
+		while(!queue.isEmpty()) {
+			int size = queue.size();
+			List<Integer> curFloor = new LinkedList<>();
+			for(int i=0; i<size; i++) {
+				curNode = queue.peek();
+				if(curNode.LNode != null) {
+					queue.add(curNode.LNode);
+				}
+				if(curNode.RNode != null) {
+					queue.add(curNode.RNode);
+				}
+				curFloor.add(curNode.value);
+				queue.poll();
+			}
+			result.add(curFloor);
+			
+		}
+		return result;
+    }
+```	
+
+
+# 104 二叉树的最大深度
+
+## 解法1 递归
+* 1 + 子树的最大深度；
+* 子树最大深度 = 左右中的最大值；
+
+```java
+    public int maxDepth1(TreeNode root) {
+		if(root == null) {
+			return 0;
+		}
+		if(root.LNode == null && root.RNode == null) {
+			return 1;
+		}
+		int LMax = maxDepth1(root.LNode);
+		int RMax = maxDepth1(root.RNode);
+		return Math.max(LMax, RMax) + 1;
+    }
+```
+
+## 解法2 层序遍历 队列
+* 常规队列，定位层数；
+
+```java
+    public int maxDepth2(TreeNode root) {
+		if(root == null) {
+			return 0;
+		}
+		Queue<TreeNode> queue = new LinkedList<>();
+		queue.add(root);
+		TreeNode curNode = null;
+		int depth = 0;
+		while(!queue.isEmpty()) {
+			int size = queue.size();
+			
+			for(int i=0; i<size; i++) {
+				curNode = queue.peek();
+				if(curNode.LNode != null) {
+					queue.add(curNode.LNode);
+				}
+				if(curNode.RNode != null) {
+					queue.add(curNode.RNode);
+				}
+				queue.poll();
+			}
+			depth++;	
+		}
+		return depth;
+	}
+```
+
+# 111 二叉树的最小深度
+## 解法1 递归
+* 1 + 子树的最小深度；
+* 注意最小深度是按照叶子节点的层数来算的；
+* 所以在过程中要去除不是叶子节点的层数；
+* 即用if left ！= null来判断，决定是否要继续遍历这一层left；
+
+```java
+    public int minDepth1(TreeNode root) {
+		if(root == null) {
+			return 0;
+		}
+		if(root.LNode == null && root.RNode == null) {
+			return 1;
+		}
+		int min = Integer.MAX_VALUE;
+		if(root.LNode != null) {
+			min = Math.min(min, minDepth1(root.LNode));
+		}
+		if(root.RNode != null) {
+			min = Math.min(min, minDepth1(root.RNode));
+		}
+		
+		return 1 + min;
+    }
+```
+
+
+## 解法2 层序遍历 队列
+* 常规队列；
+* 其中如果碰到叶子节点，即左右节点均是null，就可以直接return level；
+
+```java
+    public int minDepth2(TreeNode root) {
+		if(root == null) {
+			return 0;
+		}
+		Queue<TreeNode> queue = new LinkedList<>();
+		queue.add(root);
+		TreeNode curNode = null;
+		int level = 0;
+		while(!queue.isEmpty()) {
+			level++;
+			int size = queue.size();
+			for(int i=0; i<size; i++) {
+				curNode = queue.peek();
+				if(curNode.LNode == null && curNode.RNode == null) {
+					return level;
+				}
+				if(curNode.LNode != null) {
+					queue.add(curNode.LNode);
+				}
+				if(curNode.RNode != null) {
+					queue.add(curNode.RNode);
+				}
+				queue.poll();
+			}
+		}
+	
+		return -1;
+    }
+```
+
+
 
 
 # 148 排序链表
@@ -221,6 +421,53 @@
     }
 ```
 
+# 226 翻转二叉树
+## 解法1 递归
+* root的left = 翻转right；
+* root的right = 翻转left；
+
+```java
+    public TreeNode invertTree1(TreeNode root) {
+		 if(root == null) {
+			 return null;
+		 }
+		 TreeNode left = invertTree1(root.LNode);
+		 TreeNode right = invertTree1(root.RNode);
+		 root.LNode = right;
+		 root.RNode = left;
+		 return root;
+	}
+```
+
+## 解法2 迭代
+* 队列；
+* 定义temp表示左；
+* 左右交换；
+* 如果有左子右子继续往队列里加；
+
+```java
+    public TreeNode invertTree2(TreeNode root) {
+		 if(root == null) {
+			 return null;
+		 }
+		 Queue<TreeNode> queue = new LinkedList<>();
+		 queue.add(root);
+		 while(!queue.isEmpty()) {
+			 TreeNode curNode = queue.poll();
+			 TreeNode tempNode = curNode.LNode;
+			 curNode.LNode = curNode.RNode;
+			 curNode.RNode = tempNode;
+			 if(curNode.LNode != null) {
+				 queue.add(curNode.LNode);
+			 }
+			 if(curNode.RNode != null) {
+				 queue.add(curNode.RNode);
+			 }
+			 
+		 }
+		 return root;
+	 }
+```
 
 
 # 234 回文链表
@@ -364,6 +611,40 @@
 		return -1;
     }
 ```
+
+
+# 704 二分查找
+* 左0右length-1；
+* 只要左<右就while循环；
+* 让mid=中间index；
+* 如果中间==target直接返回；
+* 如果<target，left = mid+1；
+* 如果>target，right = mid-1；
+
+```java
+    public int search(int[] nums, int target) {
+		 if(nums == null || nums.length == 0){
+			 return -1;
+		 }
+		 int left = 0;
+		 int right = nums.length - 1;
+		 while(left <= right) {
+			 int mid = left + (right - left) / 2;
+			 if(nums[mid] == target) {
+				 return mid;
+			 }else if(nums[mid] > target) {
+				 right = mid - 1;
+			 }else if(nums[mid] < target) {
+				 left = mid + 1;
+			 }
+		 }
+		 return -1;
+	 }
+	
+```
+
+
+
 
 # Other 1 判断是否为完全二叉树
 * 通过层序遍历，将第一个null之前的所有节点入队列；
