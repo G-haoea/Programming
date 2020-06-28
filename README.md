@@ -1,5 +1,8 @@
 # 目录
+* [21 合并两个有序链表](#21-合并两个有序链表)   
+* [23 合并k个有序链表](#23-合并k个有序链表)   
 * [53 最大子序和](#53-最大子序和)   
+* [70 爬楼梯](#70-爬楼梯)     
 * [98 验证二叉搜索树](#98-验证二叉搜索树)      
 * [101 对称二叉树](#101-对称二叉树)    
   * [解法1 递归](#解法1-递归)    
@@ -15,9 +18,11 @@
 * [199 二叉树的右视图](#199-二叉树的右视图)    
   * [解法1 广度优先搜索](#解法1-广度优先搜索)    
   * [解法2 深度优先搜索](#解法2-深度优先搜索)    
+* [225 用队列实现栈](#225-用队列实现栈)    
 * [226 翻转二叉树](#226-翻转二叉树)    
   * [解法1 递归](#解法1-递归)    
-  * [解法2 迭代](#解法2-迭代)    
+  * [解法2 迭代](#解法2-迭代)   
+* [232 用栈实现队列](#232-用栈实现队列)  
 * [234 回文链表](#234-回文链表)    
   * [解法1 放入list里](#解法1-放入list里)    
   * [解法2 只翻转后半部分链表](#解法2-只翻转后半部分链表)    
@@ -27,6 +32,84 @@
 * [Other 1 判断是否为完全二叉树](#Other-1-判断是否为完全二叉树)    
 * [Other 2 找出数组中每一个数右面距离它最近的比它大的数](#Other-2-找出数组中每一个数右面距离它最近的比它大的数)    
 * [Other 3 给一个奇数位升序 偶数位降序的链表排成有序链表](#Other-3-给一个奇数位升序-偶数位降序的链表排成有序链表)    
+* [Other 4 反转一个英文句子中的单词顺序 单词内部字母顺序不变](#Other 4 反转一个英文句子中的单词顺序 单词内部字母顺序不变)    
+* [Other 5 两个超大数相加](#Other 5 两个超大数相加)    
+
+
+# 21 合并两个有序链表
+* 建立新链表头；
+* 判断两个链表头大小，选择放入；
+* 最后将剩下的链表头放入；
+
+```java
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode i = l1;
+        ListNode j = l2;
+        ListNode curNode = new ListNode(-1);
+        ListNode resultNode = curNode;
+        while(i != null && j != null) {
+        	if(i.value < j.value) {
+        		curNode.next = i;
+        		i = i.next;
+        	}else {
+        		curNode.next = j;
+        		j = j.next;
+        	}
+        	curNode = curNode.next;
+        }
+        curNode.next = i != null ? i : j;
+        return resultNode.next;
+    }
+	
+```
+
+# 23 合并k个有序链表
+* 常规归并；
+
+```java
+    public ListNode mergeKLists(ListNode[] lists) {
+		if(lists.length == 0) {
+			return null;
+		}
+		if(lists.length == 1) {
+			return lists[0];
+		}
+		if(lists.length == 2) {
+			return mergeTwoLists(lists[0], lists[1]);
+		}
+		int mid = lists.length / 2;
+		ListNode[] l1 = new ListNode[mid];
+		for(int i=0; i<mid; i++) {
+			l1[i] = lists[i];
+		}
+		ListNode[] l2 = new ListNode[lists.length - mid];
+		for(int i=0, j=mid; j<lists.length; i++, j++) {
+			l2[i] = lists[j];
+		}
+		
+		return mergeLists(mergeKLists(l1), mergeKLists(l2));
+    }
+	
+	public ListNode mergeLists(ListNode n1, ListNode n2) {
+		ListNode curNode = new ListNode(-1);
+		ListNode result = curNode;
+		ListNode i = n1;
+		ListNode j = n2;
+		while(i != null && j != null) {
+			if(i.value < j.value) {
+				curNode.next = i;
+				i = i.next;
+			}
+			if(i.value > j.value) {
+				curNode.next = j;
+				j = j.next;
+			}
+			curNode = curNode.next;
+		}
+		curNode.next = i == null ? j : i;
+		return result.next;
+	}
+```
 
 
 # 53 最大子序和
@@ -64,6 +147,30 @@
 		return max;
 	}
 ```
+
+
+
+# 70 爬楼梯
+* 递归的话会超过时间限制；
+* 动态规划定义数组大小为n+3；
+* 因为必须要大于n+2才能定义result[2]；
+
+```java
+    public int climbStairs(int n) {
+		int[] result = new int[n+3];
+		result[0] = 0;
+		result[1] = 1;
+		result[2] = 2;
+		for(int i=3; i<=n; i++) {
+			result[i] = result[i-1] + result[i-2];
+		}
+		return result[n];
+    }
+```
+【拓展】
+一个台阶总共有n级，如果一次可以跳1级，也可以跳2级......它也可以跳上n级。此时该青蛙跳上一个n级的台阶总共有多少种跳法？ -> `2 * f（n-1）`
+
+
 
 
 # 98 验证二叉搜索树
@@ -421,6 +528,57 @@
     }
 ```
 
+
+# 225 用队列实现栈
+* 入栈的队列；
+* 出栈的队列；
+* 入栈入到input里，如果output有东西，依次poll出来到input里；
+* input和output交换；
+* 这样之后output的顺序就是栈的顺序；
+
+```java
+class MyStack {
+    private Queue<Integer> input;
+    private Queue<Integer> output;
+    /** Initialize your data structure here. */
+    public MyStack() {
+        input = new LinkedList<>();
+        output = new LinkedList<>();
+    }
+    
+    /** Push element x onto stack. */
+    public void push(int x) {
+        input.add(x);
+        while(!output.isEmpty()){
+            input.add(output.poll());
+        }
+        Queue temp = input;
+        input = output;
+        output = temp;
+    }
+    
+    /** Removes the element on top of the stack and returns that element. */
+    public int pop() {
+        
+        return output.poll();
+    }
+    
+    /** Get the top element. */
+    public int top() {
+        
+        return output.peek();
+
+    }
+    
+    /** Returns whether the stack is empty. */
+    public boolean empty() {
+        return output.isEmpty();
+    }
+}
+```
+
+
+
 # 226 翻转二叉树
 ## 解法1 递归
 * root的left = 翻转right；
@@ -467,6 +625,56 @@
 		 }
 		 return root;
 	 }
+```
+
+
+# 232 用栈实现队列
+* 入队列的栈；
+* 出队列的栈；
+* 入队列就正常的入栈到表示入队列的栈；
+* 出队列先判断表示出队列的栈是否为空，如果为空，把表示入队列的栈内元素全部pop再push进表示出队列的栈，最后出栈即可；
+* peek和出队列同理；
+
+```java
+class MyQueue {
+    private Stack<Integer> input;
+    private Stack<Integer> output;
+    /** Initialize your data structure here. */
+    public MyQueue() {
+        input = new Stack<>();
+        output = new Stack<>();
+    }
+    
+    /** Push element x to the back of queue. */
+    public void push(int x) {
+        input.push(x);
+    }
+    
+    /** Removes the element from in front of queue and returns that element. */
+    public int pop() {
+        if(output.isEmpty()){
+            while(!input.isEmpty()){
+                output.push(input.pop());
+            }
+        }
+        return output.pop();
+    }
+    
+    /** Get the front element. */
+    public int peek() {
+        if(output.isEmpty()){
+            while(!input.isEmpty()){
+                output.push(input.pop());
+            }
+        }
+        return output.peek();
+    }
+    
+    /** Returns whether the queue is empty. */
+    public boolean empty() {
+        return input.isEmpty() && output.isEmpty();
+    }
+}
 ```
 
 
@@ -786,5 +994,73 @@
 		}
 		curIndexNode.next = i == null ? j : i;
 		return result.next;
+	}
+```
+
+
+
+# Other 4 反转一个英文句子中的单词顺序 单词内部字母顺序不变
+* 将string用split分开得到一个string数组；
+* 将string数组内元素反转；
+* 后赋值到一个result string当中；
+
+```java
+    public String reverseSentence(String str) {
+		if(str == null) {
+			return null;
+		}
+		String[] sentence = str.split(" ");
+		for(int i=0, j=sentence.length-1; i<=j; i++, j--) {
+			String temp = sentence[i];
+			sentence[i] = sentence[j];
+			sentence[j] = temp;
+		}
+		String result = "";
+		for(String word:sentence) {
+			result += word + " ";
+		}
+		
+		return result;
+	}
+```
+
+# Other 5 两个超大数相加
+* 用stringbuilder将它俩反转，放入一个char数组中；
+* 建立一个新的int数组，长度是最长的char数组的长度+1；
+* 两个char数组相加过程中建立temp表示当前两个数相加和；
+* 如果有进位就处理进位；
+* 最后判断最后一位是不是零，如果是零就不要放入结果string中；
+* 然后stringbuilder继续把结果string反转；
+
+```java
+    public static String bigAdd(String a, String b) {
+		String result = "";
+		char[] arrA = new StringBuilder(a).reverse().toString().toCharArray();
+		char[] arrB = new StringBuilder(b).reverse().toString().toCharArray();
+		
+		int  maxLength = 1 + Math.max(arrA.length, arrB.length);
+		int[] addAB = new int[maxLength];
+		int temp = 0;
+		for(int i=0; i<maxLength; i++) {
+			if(i < arrA.length) {
+				temp += arrA[i] - '0';
+			}
+			if(i < arrB.length) {
+				temp += arrB[i] - '0';
+			}
+			addAB[i] = temp % 10;
+			temp = temp < 10 ? 0 : 1;
+		}
+		int i;
+		for(i=0; i<addAB.length-1; i++) {
+			result += Integer.toString(addAB[i]);
+		}
+		if(addAB[i] != 0) {
+			result += Integer.toString(addAB[i]);
+		}
+		
+		String bigAddResult = new StringBuilder(result).reverse().toString();
+		
+		return bigAddResult;
 	}
 ```
