@@ -543,23 +543,23 @@
 * 根节点的depth为0；
 
 ```java
-    List<Integer> result = new ArrayList<>();
+    	List<Integer> result = new ArrayList<>();
 	public List<Integer> rightSideView2(TreeNode root) {
 		dfs(root, 0);
 		return result;
     	}
 	
 	private void dfs(TreeNode root, int depth) {
-    	if(root == null) {
-    		return;
+    		if(root == null) {
+    			return;
+    		}
+    		if(depth == result.size()) {
+    			result.add(root.value);
+    		}
+    		depth++;
+    		dfs(root.RNode, depth);
+    		dfs(root.LNode, depth);
     	}
-    	if(depth == result.size()) {
-    		result.add(root.value);
-    	}
-    	depth++;
-    	dfs(root.RNode, depth);
-    	dfs(root.LNode, depth);
-    }
 ```
 
 
