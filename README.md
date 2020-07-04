@@ -14,7 +14,11 @@
   * [解法2 层序遍历 队列](#解法2-层序遍历-队列)      
 * [111 二叉树的最小深度](#111-二叉树的最小深度)      
   * [解法1 递归](#解法1-递归)      
-  * [解法2 层序遍历 队列](#解法2-层序遍历-队列)      
+  * [解法2 层序遍历 队列](#解法2-层序遍历-队列)    
+* [112 路径总和I](#112-路径总和I)      
+  * [解法一 递归](#解法一-递归)      
+  * [解法二 深度优先搜索](#解法二-深度优先搜索)      
+* [113 路径总和II](#113-路径总和II)      
 * [148 排序链表](#148-排序链表)    
 * [199 二叉树的右视图](#199-二叉树的右视图)    
   * [解法1 广度优先搜索](#解法1-广度优先搜索)    
@@ -447,6 +451,99 @@
 ```
 
 
+
+# 112 路径总和I
+## 解法一 递归
+* 如果null直接false；
+* 如果只有root无left和right，判断root的value是否==target即可；
+* 否则return root的left，sum-root的value或上root的right，sum-root的value；
+
+```java
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if(root == null){
+            return false;
+        }
+        if(root.left == null && root.right == null){
+            return sum - root.val == 0;
+        }
+        return hasPathSum(root.left, sum-root.val) || hasPathSum(root.right, sum-root.val);
+    }
+```
+
+## 解法二 深度优先搜索
+* 注意广度优先搜索层序遍历是队列，深度优先搜索深度遍历是栈，除了需要到最后一个叶子节点的情况，深度优先搜索都比层序遍历搜索的快；
+* 两个linkedlist分别存node和sum其实就是stack；
+* 一个栈存当前的节点，首先把根节点入栈，入node的list，sum的list入值为target-root的value；
+* 如果节点node栈不为空，curnode和cursum都等于两个栈的poll；
+* 然后判断是否当前的cursum==0并且当前节点是叶子节点即没有左右子节点，如果是直接返回true；
+* 否则像层序遍历那种判断右左子树是否存在，然后入node栈，入sum栈，其中sum栈入的值是cursum-相应的左右节点值，即需要的剩余value；
+
+```java
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if (root == null){
+            return false;
+        }
+
+        LinkedList<TreeNode> nodeStack = new LinkedList();
+        LinkedList<Integer> sumStack = new LinkedList();
+        nodeStack.add(root);
+        sumStack.add(sum - root.val);
+
+        TreeNode curNode;
+        int curSum;
+        while (!nodeStack.isEmpty() ) {
+            curNode = nodeStack.poll();
+            curSum = sumStack.poll();
+            if ((curNode.right == null) && (curNode.left == null) && (curSum == 0)){
+                return true;
+            }
+            if (curNode.right != null) {
+                nodeStack.add(curNode.right);
+                sumStack.add(curSum - curNode.right.val);
+            }
+            if (curNode.left != null) {
+                nodeStack.add(curNode.left);
+                sumStack.add(curSum - curNode.left.val);
+            }
+        }
+        return false;
+
+    }
+```
+
+# 113 路径总和II
+* 深度优先搜索和回溯；
+* 结果list：result；
+* 路径list：path；
+* 回溯的参数有：result，path，curNode，target；
+* 如果curNode是空的话，直接return null；
+* 否则就把当前的节点加入到路径当中；
+* 如果当前的节点恰好符合数值要求而且还是叶子节点，就把当前的path加入到result当中；
+* 否则的话，递归走pathSum(result, path, curNode的左右子节点，sum-左右子节点的值）；
+* 如果都走遍了，最后还没有找到，其实是不管找没找到，都得把最后深度的叶子节点从path中移走，就好比最后一个叶子节点在左面，不符合要求/符合要求，就把这个节点从path移除，再判断它的兄弟（右节点）满不满足；
+
+```java
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        pathSum(result, path, root, sum);
+        return result;
+    }
+    public void pathSum(List<List<Integer>> result, List<Integer> path, TreeNode curNode, int sum){
+        if(curNode == null){
+            return;
+        }
+        path.add(curNode.val);
+        if(curNode.val == sum && curNode.left == null && curNode.right == null){
+            result.add(new ArrayList<>(path));
+        }else{
+            pathSum(result, path, curNode.left, sum - curNode.val);
+            pathSum(result, path, curNode.right, sum - curNode.val);
+        }
+        path.remove(path.size() - 1);
+
+    }
+```
 
 
 # 148 排序链表
