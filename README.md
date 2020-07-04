@@ -1,4 +1,5 @@
 # 目录
+* [3 无重复字符的最长子串](#3-无重复字符的最长子串)
 * [21 合并两个有序链表](#21-合并两个有序链表)   
 * [23 合并k个有序链表](#23-合并k个有序链表)   
 * [53 最大子序和](#53-最大子序和)   
@@ -35,6 +36,39 @@
 * [Other 4 反转一个英文句子中的单词顺序 单词内部字母顺序不变](#Other-4-反转一个英文句子中的单词顺序-单词内部字母顺序不变)    
 * [Other 5 两个超大数相加](#Other-5-两个超大数相加)    
 
+
+
+# 3 无重复字符的最长子串
+* 滑动窗口机制；
+* 如果size == 0直接输出0；
+* 准备一个滑动窗口的存储map<character，integer>，integer存的是character在s字符串中的下标；
+* 两个指针，i和j，i表示后面的end，j表示前面的begin；
+* 一开始i和j都指向第一个元素；
+* 将第一个元素放入map中，然后往后遍历；
+* 如果map中有了这个元素，就把j更新，因为要不重复，肯定是从后一个重复的字符开始重新算；
+* j是j和map中这个char的index+1的最大值；
+* 如果没有这个元素，就加入这个char，map的key是char的下标（以0开始，所以在更新j的时候要index+1）；
+* 同时要更新max，是max和i-j+1的最大值；
+
+```java
+    public int lengthOfLongestSubstring(String s) {
+        if(s.length() == 0){
+            return 0;
+        }
+        HashMap<Character, Integer> map = new HashMap<>();
+        int i=0;
+        int j=0;
+        int max = 0;
+        for(i = 0; i<s.length(); i++){
+            if(map.containsKey(s.charAt(i))){
+                j = Math.max(j, map.get(s.charAt(i)) + 1);
+            }
+            map.put(s.charAt(i), i);
+            max = Math.max(max, i-j+1);
+        }
+        return max;
+    }
+```
 
 # 21 合并两个有序链表
 * 建立新链表头；
