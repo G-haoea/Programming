@@ -547,7 +547,7 @@
 	public List<Integer> rightSideView2(TreeNode root) {
 		dfs(root, 0);
 		return result;
-    }
+    	}
 	
 	private void dfs(TreeNode root, int depth) {
     	if(root == null) {
