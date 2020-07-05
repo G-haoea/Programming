@@ -56,19 +56,20 @@
 
 ```java
     public int lengthOfLongestSubstring(String s) {
-        if(s.length() == 0){
-            return 0;
+        if(s.length() == 0) {
+        	return 0;
         }
         HashMap<Character, Integer> map = new HashMap<>();
         int i=0;
         int j=0;
         int max = 0;
-        for(i = 0; i<s.length(); i++){
-            if(map.containsKey(s.charAt(i))){
-                j = Math.max(j, map.get(s.charAt(i)) + 1);
-            }
-            map.put(s.charAt(i), i);
-            max = Math.max(max, i-j+1);
+        for(i=0; i<s.length(); i++) {
+        	if(map.containsKey(s.charAt(i))) {
+        		j = Math.max(j, map.get(s.charAt(i)) + 1);
+        	}else {
+        		map.put(s.charAt(i), i);
+        		max = Math.max(max, i-j+1);
+        	}
         }
         return max;
     }
@@ -459,14 +460,14 @@
 * 否则return root的left，sum-root的value或上root的right，sum-root的value；
 
 ```java
-    public boolean hasPathSum(TreeNode root, int sum) {
-        if(root == null){
-            return false;
+    public boolean hasPathSum1(TreeNode root, int sum) {
+        if(root == null) {
+        	return false;
         }
-        if(root.left == null && root.right == null){
-            return sum - root.val == 0;
+        if(root.LNode == null && root.RNode == null && root.value == sum) {
+        	return true;
         }
-        return hasPathSum(root.left, sum-root.val) || hasPathSum(root.right, sum-root.val);
+        return hasPathSum1(root.LNode, sum - root.value) || hasPathSum1(root.RNode, sum - root.value);
     }
 ```
 
@@ -479,35 +480,32 @@
 * 否则像层序遍历那种判断右左子树是否存在，然后入node栈，入sum栈，其中sum栈入的值是cursum-相应的左右节点值，即需要的剩余value；
 
 ```java
-    public boolean hasPathSum(TreeNode root, int sum) {
-        if (root == null){
-            return false;
-        }
-
-        LinkedList<TreeNode> nodeStack = new LinkedList();
-        LinkedList<Integer> sumStack = new LinkedList();
-        nodeStack.add(root);
-        sumStack.add(sum - root.val);
-
-        TreeNode curNode;
-        int curSum;
-        while (!nodeStack.isEmpty() ) {
-            curNode = nodeStack.poll();
-            curSum = sumStack.poll();
-            if ((curNode.right == null) && (curNode.left == null) && (curSum == 0)){
-                return true;
-            }
-            if (curNode.right != null) {
-                nodeStack.add(curNode.right);
-                sumStack.add(curSum - curNode.right.val);
-            }
-            if (curNode.left != null) {
-                nodeStack.add(curNode.left);
-                sumStack.add(curSum - curNode.left.val);
-            }
-        }
-        return false;
-
+   public boolean hasPathSum2(TreeNode root, int sum) {
+    	if(root == null) {
+    		return false;
+    	}
+    	Stack<TreeNode> nodeStack = new Stack<>();
+    	Stack<Integer> sumStack = new Stack<>();
+    	sumStack.add(sum - root.value);
+    	nodeStack.add(root);
+    	TreeNode curNode = null;
+    	int curSum = 0;
+    	while(!nodeStack.isEmpty()) {
+    		curNode = nodeStack.pop();
+    		curSum = sumStack.pop();
+    		if(curNode.LNode == null && curNode.RNode == null && curSum == 0) {
+    			return true;
+    		}
+    		if(curNode.RNode != null) {
+    			nodeStack.add(curNode.RNode);
+    			sumStack.add(curSum - curNode.RNode.value);
+    		}
+    		if(curNode.LNode != null) {
+    			nodeStack.add(curNode.LNode);
+    			sumStack.add(curSum - curNode.LNode.value);
+    		}
+    	}
+    	return false;
     }
 ```
 
@@ -523,24 +521,25 @@
 * 如果都走遍了，最后还没有找到，其实是不管找没找到，都得把最后深度的叶子节点从path中移走，就好比最后一个叶子节点在左面，不符合要求/符合要求，就把这个节点从path移除，再判断它的兄弟（右节点）满不满足；
 
 ```java
-    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+   public List<List<Integer>> pathSum(TreeNode root, int sum) {
         List<List<Integer>> result = new ArrayList<>();
-        List<Integer> path = new ArrayList<>();
-        pathSum(result, path, root, sum);
+        List<Integer> curPath = new ArrayList<>();
+        recursion(result, curPath, root, sum);
         return result;
     }
-    public void pathSum(List<List<Integer>> result, List<Integer> path, TreeNode curNode, int sum){
-        if(curNode == null){
-            return;
+    public void recursion(List<List<Integer>> result, List<Integer> curPath, TreeNode curNode, int sum){
+        if(curNode == null) {
+        	return;
         }
-        path.add(curNode.val);
-        if(curNode.val == sum && curNode.left == null && curNode.right == null){
-            result.add(new ArrayList<>(path));
-        }else{
-            pathSum(result, path, curNode.left, sum - curNode.val);
-            pathSum(result, path, curNode.right, sum - curNode.val);
+        curPath.add(curNode.value);
+        if(curNode.value == sum && curNode.LNode == null && curNode.RNode == null) {
+        	result.add(new ArrayList<>(curPath));
+        }else {
+        	recursion(result, curPath, curNode.LNode, sum-curNode.value);
+        	recursion(result, curPath, curNode.RNode, sum-curNode.value);
         }
-        path.remove(path.size() - 1);
+        curPath.remove(curPath.size()-1);
+        
 
     }
 ```
