@@ -549,7 +549,7 @@
 ```
 
 
-## 121 买卖股票的最佳时机I
+# 121 买卖股票的最佳时机I
 ```java
     public int maxProfit(int[] prices) {
         int n = prices.length;
@@ -570,7 +570,7 @@
     }
 ```
 
-## 122 买卖股票的最佳时机II
+# 122 买卖股票的最佳时机II
 ```java
     public int maxProfit(int[] prices) {
         int n = prices.length;
@@ -591,7 +591,7 @@
     }
 ```
 
-## 123 买卖股票的最佳时机III
+# 123 买卖股票的最佳时机III
 ```java
     public int maxProfit(int[] prices) {
         int n = prices.length;
@@ -665,7 +665,7 @@
 ```
 
 
-## 188 买卖股票的最佳时机IV
+# 188 买卖股票的最佳时机IV
 ```java
     public int maxProfit(int k, int[] prices) {
         int n = prices.length;
