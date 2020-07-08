@@ -1,8 +1,16 @@
 # 目录
-* [3 无重复字符的最长子串](#3-无重复字符的最长子串)
+* [1 两数之和](#1-两数之和)     
+  * [解法1 暴力](#解法1-暴力)     
+  * [解法2 哈希表](#解法2-哈希表)     
+* [2 两数相加](#2-两数相加)     
+* [3 无重复字符的最长子串](#3-无重复字符的最长子串)     
+* [20 有效的括号](#20-有效的括号)     
 * [21 合并两个有序链表](#21-合并两个有序链表)   
 * [23 合并k个有序链表](#23-合并k个有序链表)   
 * [53 最大子序和](#53-最大子序和)   
+* [55 跳跃游戏](#55-跳跃游戏)   
+  * [解法1 动态规划](#解法1-动态规划)   
+  * [解法2 贪心算法](#解法2-贪心算法)   
 * [70 爬楼梯](#70-爬楼梯)     
 * [98 验证二叉搜索树](#98-验证二叉搜索树)      
 * [101 对称二叉树](#101-对称二叉树)    
@@ -27,6 +35,7 @@
 * [199 二叉树的右视图](#199-二叉树的右视图)    
   * [解法1 广度优先搜索](#解法1-广度优先搜索)    
   * [解法2 深度优先搜索](#解法2-深度优先搜索)    
+* [206 反转链表](#206-反转链表)      
 * [225 用队列实现栈](#225-用队列实现栈)    
 * [226 翻转二叉树](#226-翻转二叉树)    
   * [解法1 递归](#解法1-递归)    
@@ -44,6 +53,84 @@
 * [Other 4 反转一个英文句子中的单词顺序 单词内部字母顺序不变](#Other-4-反转一个英文句子中的单词顺序-单词内部字母顺序不变)    
 * [Other 5 两个超大数相加](#Other-5-两个超大数相加)    
 
+
+
+
+# 1 两数之和
+## 解法1 暴力
+* 遍历，看i和j的和是不是等于target；
+
+```java
+    public int[] twoSum1(int[] nums, int target) {
+		int n = nums.length;
+		int[] result = new int[2];
+		for(int i=0; i<n-1; i++) {
+			for(int j=i+1; j<n; j++) {
+				if(nums[i] + nums[j] == target) {
+					result[0] = Math.min(i, j);
+					result[1] = Math.max(i, j);
+					return result;
+				}
+			}
+		}
+        return result;
+    }
+```
+
+## 解法2 哈希表
+* 查表有没有剩余的差的key；
+* 如果没有就加入表；
+
+```java
+    public int[] twoSum2(int[] nums, int target) {
+		int n = nums.length;
+        Map<Integer, Integer> hashMap = new HashMap<>();
+        for(int i=0; i<n; i++) {
+        	if(hashMap.containsKey(target-nums[i])) {
+        		return new int[] {hashMap.get(target-nums[i]), i};
+        	}else {
+        		hashMap.put(nums[i], i);
+        	}
+        }
+        return new int[] {-1, -1};
+    }
+```
+
+# 2 两数相加
+* x是第一个加数；
+* y是第二个加数；
+* temp是进位；
+* sum是xytemp的和；
+* while条件是p或q不为null；
+
+```java
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+		ListNode p = l1;
+		ListNode q = l2;
+		ListNode curNode = new ListNode(-1);
+		ListNode result = curNode;
+		int temp = 0;
+		while(p != null || q != null) {
+			int x = p == null ? 0 : p.value;
+			int y = q == null ? 0 : q.value;
+			int curSum = x + y + temp;
+			curNode.next = new ListNode(curSum % 10);
+			temp = curSum / 10;
+			curNode = curNode.next;
+			if(p != null) {
+				p = p.next;
+			}
+			if(q != null) {
+				q = q.next;
+			}
+		}
+		if(temp > 0) {
+			curNode.next = new ListNode(1);
+		}
+		return result.next;
+    }
+
+```
 
 
 # 3 无重复字符的最长子串
@@ -79,6 +166,45 @@
         return max;
     }
 ```
+
+
+
+# 20 有效的括号
+* 用栈和hashmap存；
+* curchar和topchar进行比较；
+* 如果栈是空topchar就随便给一个#，不是空就拿来和curchar比较；
+* 当然curchar是hashmap里的key；
+* hashmap里的value是一对括号中的前一个；
+
+```java
+    public boolean isValid(String s) {
+		if(s.length() == 0) {
+			return true;
+		}
+		Stack<Character> stack = new Stack<>();
+		Map<Character, Character> map = new HashMap<>();
+		map.put(']', '[');
+		map.put(')', '(');
+		map.put('}', '{');
+	
+		for(int i=0; i<s.length(); i++) {
+			char curChar = s.charAt(i);
+			if(map.containsKey(curChar)) {
+				char topEle = stack.isEmpty() ? '#' : stack.pop();
+				if(topEle != map.get(curChar)) {
+					return false;
+				}
+			}else {
+				stack.push(curChar);
+			}
+			
+		}
+		return stack.isEmpty();
+    }
+```
+
+
+
 
 # 21 合并两个有序链表
 * 建立新链表头；
@@ -189,6 +315,60 @@
 		}
 		System.out.println(start + "..." + end);
 		return max;
+	}
+```
+
+
+
+
+# 55 跳跃游戏
+## 解法1 动态规划
+* 找状态定义数组dp是当前位置能到或者不能到；
+* 转化公式是当前位置的boolean值或上能到达的所有boolean值；
+
+```java
+    public boolean canJump1(int[] nums) {
+		int n = nums.length;
+		if(n == 0) {
+			return true;
+		}
+		boolean[] dp = new boolean[n];
+		for(int i=n-1; i>=0; i--) {
+			if(i == n-1) {
+				dp[i] = true;
+				continue;
+			}
+			for(int j=0; j<=nums[i]; j++) {
+				if(dp[i] == true) {
+					break;
+				}else {
+					dp[i] = dp[i+j];
+				}
+			}
+			
+		}
+		return dp[0];
+    }
+```
+
+## 解法2 贪心算法
+* 定义一个最远到达rightmost；
+* 判断当前的点是否在rightmost内；
+* 如果rightmost大于最后一个点就能到达；
+
+```java
+    public boolean canJump2(int[] nums) {
+		int n = nums.length;
+		int rightMost = 0;
+		for(int i=0; i<n; i++) {
+			if(i <= rightMost) {
+				rightMost = Math.max(rightMost, nums[i] + i);
+				if(rightMost >= n-1) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 ```
 
@@ -772,6 +952,33 @@
     		dfs(root.RNode, depth);
     		dfs(root.LNode, depth);
     	}
+```
+
+
+
+
+# 206 反转链表
+* cur的next存为temp；
+* 先让cur的next指向pre；
+* 再让pre变成cur；
+* cur变成temp；
+* 至此就反转了第一个的结尾是null（原先的pre）；
+
+```java
+    public ListNode reverseList(ListNode head) {
+		if(head == null) {
+			return null;
+		}
+		ListNode curNode = head;
+		ListNode preNode = null;
+		while(curNode != null) {
+			ListNode nextNode = curNode.next;
+			curNode.next = preNode;
+			preNode = curNode;
+			curNode = nextNode;
+		}
+		return preNode;
+    }
 ```
 
 
