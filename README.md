@@ -55,7 +55,8 @@
 * 将第一个元素放入map中，然后往后遍历；
 * 如果map中有了这个元素，就把j更新，因为要不重复，肯定是从后一个重复的字符开始重新算；
 * j是j和map中这个char的index+1的最大值；
-* 如果没有这个元素，就加入这个char，map的key是char的下标（以0开始，所以在更新j的时候要index+1）；
+* 如果没有这个元素，就加入这个char，map的key是char的下标（以0开始，所以在更新j的时候要index+1）；    
+* 就算有这个char，更新完j之后，还要更新这个char对应的value，所以不用else；       
 * 同时要更新max，是max和i-j+1的最大值；
 
 ```java
@@ -70,10 +71,10 @@
         for(i=0; i<s.length(); i++) {
         	if(map.containsKey(s.charAt(i))) {
         		j = Math.max(j, map.get(s.charAt(i)) + 1);
-        	}else {
-        		map.put(s.charAt(i), i);
-        		max = Math.max(max, i-j+1);
         	}
+		map.put(s.charAt(i), i);
+        	max = Math.max(max, i-j+1);
+        	
         }
         return max;
     }
