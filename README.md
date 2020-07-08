@@ -19,7 +19,11 @@
   * [解法一 递归](#解法一-递归)      
   * [解法二 深度优先搜索](#解法二-深度优先搜索)      
 * [113 路径总和II](#113-路径总和II)      
+* [121 买卖股票的最佳时机I](#121-买卖股票的最佳时机I)     
+* [122 买卖股票的最佳时机II](#122-买卖股票的最佳时机II)     
+* [123 买卖股票的最佳时机III](#123-买卖股票的最佳时机III)     
 * [148 排序链表](#148-排序链表)    
+* [188 买卖股票的最佳时机IV](#188-买卖股票的最佳时机IV)     
 * [199 二叉树的右视图](#199-二叉树的右视图)    
   * [解法1 广度优先搜索](#解法1-广度优先搜索)    
   * [解法2 深度优先搜索](#解法2-深度优先搜索)    
@@ -545,6 +549,76 @@
 ```
 
 
+## 121 买卖股票的最佳时机I
+```java
+    public int maxProfit(int[] prices) {
+        int n = prices.length;
+        if(n == 0){
+            return 0;
+        }
+        int[][] dp = new int[n][2];
+        for(int i=0; i<n; i++){
+            if(i == 0){
+                dp[i][0] = 0;
+                dp[i][1] = -prices[i];
+                continue;
+            }
+            dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] + prices[i]);
+            dp[i][1] = Math.max(dp[i-1][1], -prices[i]);
+        }
+        return dp[n-1][0];
+    }
+```
+
+## 122 买卖股票的最佳时机II
+```java
+    public int maxProfit(int[] prices) {
+        int n = prices.length;
+        if(n == 0){
+            return 0;
+        }
+        int[][] dp = new int[n][2];
+        for(int i=0; i<n; i++){
+            if(i == 0){
+                dp[i][0] = 0;
+                dp[i][1] = -prices[i];
+                continue;
+            }
+            dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] + prices[i]);
+            dp[i][1] = Math.max(dp[i-1][1], dp[i-1][0] - prices[i]);
+        }
+        return dp[n-1][0];
+    }
+```
+
+## 123 买卖股票的最佳时机III
+```java
+    public int maxProfit(int[] prices) {
+        int n = prices.length;
+        if(n == 0){
+            return 0;
+        }
+        int[][][] dp = new int[n][3][2];
+        for(int i=0; i<n; i++){
+            if(i == 0){
+                dp[i][1][0] = 0;
+                dp[i][2][0] = 0;
+                dp[i][1][1] = -prices[i];
+                dp[i][2][1] = -prices[i];
+                continue;
+            }
+            dp[i][1][0] = Math.max(dp[i-1][1][0], dp[i-1][1][1] + prices[i]);
+            dp[i][2][0] = Math.max(dp[i-1][2][0], dp[i-1][2][1] + prices[i]);
+            dp[i][1][1] = Math.max(dp[i-1][1][1], -prices[i]);
+            dp[i][2][1] = Math.max(dp[i-1][2][1], dp[i-1][1][0] - prices[i]);
+
+        }
+        return dp[n-1][2][0];
+    }
+```
+
+
+
 # 148 排序链表
 * 归并排序；
 * 先递归排序好左右两部分；
@@ -590,6 +664,47 @@
 	}
 ```
 
+
+## 188 买卖股票的最佳时机IV
+```java
+    public int maxProfit(int k, int[] prices) {
+        int n = prices.length;
+        if(n == 0 || k == 0){
+            return 0;
+        }
+        if(k > n / 2){
+            return maxProfitForInf(prices);
+        }
+        int[][][] dp = new int[n][k+1][2];
+        for(int i=0; i<n; i++){
+            for(int j=1; j<k+1; j++){
+                if(i == 0){
+                    dp[i][j][0] = 0;
+                    dp[i][j][1] = -prices[i];
+                    continue;
+                }
+                dp[i][j][0] = Math.max(dp[i-1][j][0], dp[i-1][j][1] + prices[i]);
+                dp[i][j][1] = Math.max(dp[i-1][j][1], dp[i-1][j-1][0] - prices[i]);
+            }
+        }
+        return dp[n-1][k][0];
+        
+    }
+    public int maxProfitForInf(int[] prices) {
+        int n = prices.length;
+        int[][] dp = new int[n][2];
+        for(int i=0; i<n; i++){
+            if(i == 0){
+                dp[i][0] = 0;
+                dp[i][1] = -prices[i];
+                continue;
+            }
+            dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] + prices[i]);
+            dp[i][1] = Math.max(dp[i-1][1], dp[i-1][0] - prices[i]);
+        }
+        return dp[n-1][0];
+    }
+```
 
 # 199 二叉树的右视图
 ## 解法1 广度优先搜索
