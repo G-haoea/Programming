@@ -32,6 +32,9 @@
 * [123 买卖股票的最佳时机III](#123-买卖股票的最佳时机III)     
 * [148 排序链表](#148-排序链表)    
 * [188 买卖股票的最佳时机IV](#188-买卖股票的最佳时机IV)     
+* [189 旋转数组](#189-旋转数组)     
+  * [解法1 建立新数组 步数一步到位](#解法1-建立新数组-步数一步到位)     
+  * [解法2 原地移动](#解法2-原地移动)     
 * [199 二叉树的右视图](#199-二叉树的右视图)    
   * [解法1 广度优先搜索](#解法1-广度优先搜索)    
   * [解法2 深度优先搜索](#解法2-深度优先搜索)    
@@ -886,6 +889,50 @@
         return dp[n-1][0];
     }
 ```
+
+
+
+# 189 旋转数组
+## 解法1 建立新数组 步数一步到位
+```java
+    public void rotate1(int[] nums, int k) {
+		if(nums == null || nums.length == 0) {
+			return;
+		}
+		int step = k % nums.length;
+	
+		int[] result = new int[nums.length];
+		int index = 0;
+		for(int i = nums.length - step; i<nums.length; i++) {
+			result[index++] = nums[i];
+		}
+		for(int i=0; i<nums.length-step; i++) {
+			result[index++] = nums[i];
+		}
+		int j = 0;
+		for(int ele:result){
+            nums[j++] = ele;
+        }
+    }
+```
+
+## 解法2 原地移动
+```java
+    public void rotate2(int[] nums, int k) {
+        if(nums == null || nums.length == 0) {
+			return;
+		}
+		int step = k % nums.length;
+		for(int i=0; i<step; i++){
+            int temp = nums[nums.length-1];
+            for(int j=nums.length-1; j>0; j--){
+                nums[j] = nums[j-1];
+            }
+            nums[0] = temp;
+        }
+    }
+```
+
 
 # 199 二叉树的右视图
 ## 解法1 广度优先搜索
