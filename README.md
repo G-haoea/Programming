@@ -31,6 +31,7 @@
 * [122 买卖股票的最佳时机II](#122-买卖股票的最佳时机II)     
 * [123 买卖股票的最佳时机III](#123-买卖股票的最佳时机III)     
 * [148 排序链表](#148-排序链表)    
+* [160 相交链表](#160-相交链表)    
 * [188 买卖股票的最佳时机IV](#188-买卖股票的最佳时机IV)     
 * [189 旋转数组](#189-旋转数组)     
   * [解法1 建立新数组 步数一步到位](#解法1-建立新数组-步数一步到位)     
@@ -39,6 +40,7 @@
   * [解法1 广度优先搜索](#解法1-广度优先搜索)    
   * [解法2 深度优先搜索](#解法2-深度优先搜索)    
 * [206 反转链表](#206-反转链表)      
+* [215 数组中第k个最大元素](#215-数组中第k个最大元素)      
 * [225 用队列实现栈](#225-用队列实现栈)    
 * [226 翻转二叉树](#226-翻转二叉树)    
   * [解法1 递归](#解法1-递归)    
@@ -48,6 +50,7 @@
   * [解法1 放入list里](#解法1-放入list里)    
   * [解法2 只翻转后半部分链表](#解法2-只翻转后半部分链表)    
 * [236 二叉树的最近公共祖先](#236-二叉树的最近公共祖先)    
+* [344 反转字符串](#344-反转字符串)    
 * [387 字符串中的第一个唯一字符](#387-字符串中的第一个唯一字符)    
 * [704 二分查找](#704-二分查找)     
 * [Other 1 判断是否为完全二叉树](#Other-1-判断是否为完全二叉树)    
@@ -849,6 +852,25 @@
 ```
 
 
+# 160 相交链表
+
+![相交链表1](https://github.com/iii17-grace/Programming/blob/master/images/%E7%9B%B8%E4%BA%A4%E9%93%BE%E8%A1%A81.png)
+![相交链表2](https://github.com/iii17-grace/Programming/blob/master/images/%E7%9B%B8%E4%BA%A4%E9%93%BE%E8%A1%A82.png)
+
+```java
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode p = headA;
+        ListNode q = headB;
+        while(p != q) {
+        	p = p == null ? headB : p.next;
+        	q = q == null ? headA : q.next;
+        }
+        return p;
+       
+    }
+```
+
+
 # 188 买卖股票的最佳时机IV
 ```java
     public int maxProfit(int k, int[] prices) {
@@ -1027,6 +1049,34 @@
 		return preNode;
     }
 ```
+
+
+# 215 数组中第k个最大元素
+* 注意不是第k个不同的元素；
+* 排序之后找k-1；
+
+```java
+    public int findKthLargest(int[] nums, int k) {
+        quickSort(nums);
+        return nums[k-1];
+    }
+    public void quickSort(int[] nums){
+        for(int i=0; i<nums.length; i++){
+            int curMax = nums[i];
+            int curIndex = i;
+            for(int j=i+1; j<nums.length; j++){
+                if(nums[j] > curMax){
+                    curMax = nums[j];
+                    curIndex = j;
+                }
+            }
+            int temp = nums[i];
+            nums[i] = curMax;
+            nums[curIndex] = temp;
+        }
+    }
+```
+
 
 
 # 225 用队列实现栈
@@ -1297,6 +1347,23 @@ class MyQueue {
         return root;
     }
 ```
+
+
+# 344 反转字符串
+* mid = length / 2；
+
+```java
+    public void reverseString(char[] s) {
+    	int mid = s.length / 2;
+    	for(int i=0; i<mid; i++) {
+    		char temp = s[i];
+    		s[i] = s[s.length-i-1];
+    		s[s.length-i-1] = temp;
+    	}
+    }
+```
+
+
 
 # 387 字符串中的第一个唯一字符
 * 将字符串s放入char数组中；
